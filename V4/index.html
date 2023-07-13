@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cronômetro</title>
+  <style>
+    body {
+      background-image: url("wall_1.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    .timer {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .log {
+      font-size: 16px;
+      margin-top: 20px;
+      text-align: left;
+      transition: height 0.3s;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: black;
+    }
+
+    .log.expanded {
+      height: 200px;
+    }
+
+    .button {
+      margin-top: 20px;
+    }
+
+    .highlight {
+      background-color: green;
+      color: black;
+    }
+
+    .highlight-wrong {
+      background-color: red;
+      color: black;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: white;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="timer" id="timer">
+      <span id="seconds">00</span>:<span id="milliseconds">000</span>
+    </div>
+    <textarea id="log" class="log" placeholder="Clique no botão 'Iniciar' para começar o cronômetro" disabled></textarea>
+    <div>
+      <label for="minInput">Minimo:</label>
+      <input type="text" id="minInput" value="100">
+      <label for="maxInput">Máximo:</label>
+      <input type="text" id="maxInput" value="500">
+    </div>
+    <button class="button" onclick="startTimer()">Iniciar Cronômetro</button>
+    <button class="button" onclick="logTime()">ATAQUE</button>
+    <button class="button" onclick="hideMilliseconds()">Esconder Milesegundos</button>
+    <div class="footer">
+      Developed by deadft
+    </div>
+  </div>
+
+  <script>
+    var startTime;
+    var timerInterval;
+    var timerRunning = false;
+    var showMilliseconds = true;
+    var withinRange = false;
+
+    // Função para iniciar o cronômetro
+    function startTimer() {
+      if (!timerRunning) {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1);
+        timerRunning = true;
+      }
+    }
+
+    // Função para parar o cronômetro
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+    }
+
+    // Função para atualizar o cronômetro
+    function updateTimer() {
+      var elapsedTime = Date.now() - startTime;
+      var seconds = Math.floor(elapsedTime / 1000);
+      var milliseconds = (elapsedTime % 1000).toString().padStart(3, '0');
+      document.getElementById('seconds').innerHTML = seconds.toString().padStart(2, '0');
+      document.getElementById('milliseconds').innerHTML = milliseconds;
+
+      var minInput = parseInt(document.getElementById('minInput').value);
+      var maxInput = parseInt(document.getElementById('maxInput').value);
+      var currentMilliseconds = parseInt(milliseconds);
+
+      if (currentMilliseconds >= minInput && currentMilliseconds <= maxInput) {
+        if (!withinRange) {
+          withinRange = true;
+          document.getElementById('log').classList.add('highlight');
+        }
+      } else {
+        if (withinRange) {
+          withinRange = false;
+          document.getElementById('log').classList.remove('highlight');
+        }
+      }
+    }
+
+    // Função para registrar o tempo no clique
+    function logTime() {
+      var time = document.getElementById('milliseconds').innerHTML;
+      var log = document.getElementById('log');
+      var minInput = parseInt(document.getElementById('minInput').value);
+      var maxInput = parseInt(document.getElementById('maxInput').value);
+      var currentMilliseconds = parseInt(time);
+      var isWithinRange = currentMilliseconds >= minInput && currentMilliseconds <= maxInput;
+
+      if (isWithinRange) {
+        log.value = time + '\n' + log.value;
+        log.classList.add('expanded');
+        log.style.backgroundColor = "green";
+        log.style.color = "black";
+      } else {
+        log.value = time + ' (Erro)\n' + log.value;
+        log.classList.add('expanded');
+        log.style.backgroundColor = "red";
+        log.style.color = "black";
+      }
+    }
+
+    // Função para esconder os milissegundos no cronômetro
+    function hideMilliseconds() {
+      showMilliseconds = !showMilliseconds;
+      var millisecondsElement = document.getElementById('milliseconds');
+      if (showMilliseconds) {
+        millisecondsElement.style.display = 'inline';
+      } else {
+        millisecondsElement.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cronômetro</title>
+  <style>
+    .container {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .timer {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .log {
+      font-size: 16px;
+      margin-top: 20px;
+      text-align: left;
+      transition: height 0.3s;
+    }
+    .log.expanded {
+      height: 200px;
+    }
+    .button {
+      margin-top: 20px;
+    }
+    .highlight {
+      background-color: green;
+      color: black;
+    }
+    .highlight-wrong {
+      background-color: red;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="timer" id="timer">
+      <span id="seconds">00</span>:<span id="milliseconds">000</span>
+    </div>
+    <textarea id="log" class="log" placeholder="Clique no botão 'Iniciar' para começar o cronômetro" disabled></textarea>
+    <div>
+      <label for="minInput">Minimo:</label>
+      <input type="text" id="minInput" value="100">
+      <label for="maxInput">Máximo:</label>
+      <input type="text" id="maxInput" value="500">
+    </div>
+    <button class="button" onclick="startTimer()">Iniciar</button>
+    <button class="button" onclick="logTime()">Clique</button>
+    <button class="button" onclick="hideMilliseconds()">Esconder</button>
+  </div>
+
+  <script>
+    var startTime;
+    var timerInterval;
+    var timerRunning = false;
+    var showMilliseconds = true;
+
+    // Função para iniciar o cronômetro
+    function startTimer() {
+      if (!timerRunning) {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1);
+        timerRunning = true;
+      }
+    }
+
+    // Função para parar o cronômetro
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+    }
+
+    // Função para atualizar o cronômetro
+    function updateTimer() {
+      var elapsedTime = Date.now() - startTime;
+      var seconds = Math.floor(elapsedTime / 1000);
+      var milliseconds = (elapsedTime % 1000).toString().padStart(3, '0');
+      document.getElementById('seconds').innerHTML = seconds.toString().padStart(2, '0');
+      document.getElementById('milliseconds').innerHTML = milliseconds;
+
+      var minInput = document.getElementById('minInput').value;
+      var maxInput = document.getElementById('maxInput').value;
+      var currentMilliseconds = parseInt(milliseconds);
+
+      if (currentMilliseconds >= minInput && currentMilliseconds <= maxInput) {
+        document.getElementById('timer').classList.add('highlight');
+      } else {
+        document.getElementById('timer').classList.remove('highlight');
+      }
+    }
+
+    // Função para registrar o tempo no clique
+    function logTime() {
+      var time = document.getElementById('milliseconds').innerHTML;
+      var log = document.getElementById('log');
+      var minInput = parseInt(document.getElementById('minInput').value);
+      var maxInput = parseInt(document.getElementById('maxInput').value);
+      var currentMilliseconds = parseInt(time);
+      var isWithinRange = currentMilliseconds >= minInput && currentMilliseconds <= maxInput;
+
+      if (isWithinRange) {
+        log.value = time + '\n' + log.value;
+        log.classList.add('expanded');
+      } else {
+        log.value = time + ' (Erro)\n' + log.value;
+        log.classList.add('expanded');
+      }
+
+      if (isWithinRange) {
+        log.style.color = "black";
+        log.style.backgroundColor = "green";
+      } else {
+        log.style.color = "black";
+        log.style.backgroundColor = "red";
+      }
+    }
+
+    // Função para esconder os milissegundos no cronômetro
+    function hideMilliseconds() {
+      showMilliseconds = !showMilliseconds;
+      var millisecondsElement = document.getElementById('milliseconds');
+      if (showMilliseconds) {
+        millisecondsElement.style.display = 'inline';
+      } else {
+        millisecondsElement.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
